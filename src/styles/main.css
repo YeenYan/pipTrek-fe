@@ -1,0 +1,7 @@
+/* Design system tokens (light + dark variables) */
+@import './design-system.css';
+
+/* Tailwind layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
