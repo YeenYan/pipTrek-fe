@@ -7,10 +7,10 @@ import router from './router'
 // Global styles — Tailwind + design system tokens
 import './styles/main.css'
 
-// Apply saved theme on app start
+// Dark mode is default — only remove if user explicitly chose light
 const savedTheme = localStorage.getItem('theme')
-if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-  document.documentElement.classList.add('dark')
+if (savedTheme === 'light') {
+  document.documentElement.classList.remove('dark')
 }
 
 const app = createApp(App)

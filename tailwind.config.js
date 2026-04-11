@@ -22,6 +22,7 @@ export default {
         danger: 'var(--color-danger)',
         success: 'var(--color-success)',
         warning: 'var(--color-warning)',
+        input: 'var(--color-input)',
       },
     },
   },
