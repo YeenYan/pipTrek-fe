@@ -14,6 +14,7 @@ import BaseButton from '@/components/BaseButton.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
 import { useFormErrors } from '@/composables/useFormErrors'
+import { EnvelopeIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const { login, state } = useAuth()
@@ -68,25 +69,8 @@ async function handleLogin() {
     <BaseCard>
       <!-- Logo -->
       <div class="flex justify-center mb-5">
-        <div
-          class="w-14 h-14 rounded-xl bg-surface border border-border flex items-center justify-center shadow-lg"
-        >
-          <svg
-            class="w-8 h-8 text-primary"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="8"
-              stroke-dasharray="44"
-              stroke-dashoffset="8"
-              stroke-linecap="round"
-            />
-          </svg>
+        <div class="w-14 h-14 rounded-xl bg-primary flex items-center justify-center shadow-lg">
+          <span class="text-2xl font-bold text-white">P</span>
         </div>
       </div>
 
@@ -111,19 +95,7 @@ async function handleLogin() {
           :error="firstError('email')"
         >
           <template #icon>
-            <svg
-              class="w-5 h-5 text-textSecondary shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
-              />
-            </svg>
+            <EnvelopeIcon class="w-5 h-5 text-textSecondary shrink-0" />
           </template>
         </BaseInput>
 
@@ -134,19 +106,7 @@ async function handleLogin() {
           :error="firstError('password')"
         >
           <template #icon>
-            <svg
-              class="w-5 h-5 text-textSecondary shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-              />
-            </svg>
+            <LockClosedIcon class="w-5 h-5 text-textSecondary shrink-0" />
           </template>
         </BaseInput>
 

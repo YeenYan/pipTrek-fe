@@ -20,7 +20,7 @@ const { verifyOtp, resendOtp, state } = useAuth()
 const toast = useToast()
 
 const otpCode = ref('')
-const email = (route.query.email as string) ?? ''
+const email = (route.query.email as string) || state.otpEmail
 
 /** Verify the entered OTP code */
 async function handleVerify() {

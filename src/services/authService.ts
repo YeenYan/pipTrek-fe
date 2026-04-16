@@ -11,10 +11,16 @@ import { mutation, query, type GraphQLResponse } from '@/utils/graphqlClient'
 /*  TypeScript interfaces matching the backend response shapes        */
 /* ------------------------------------------------------------------ */
 
+export interface Role {
+  id: string
+  name: string
+}
+
 export interface User {
   id: string
   name: string
   email: string
+  roles?: Role[]
   two_factor_enabled?: boolean
   is_first_login?: boolean
   created_at?: string
@@ -234,7 +240,17 @@ export function me(): Promise<GraphQLResponse<MeResponse>> {
   return query<MeResponse>(
     `query Me {
       me {
-        id name email two_factor_enabled is_first_login created_at updated_at
+        id
+        name
+        email
+        two_factor_enabled
+        is_first_login
+        created_at
+        updated_at
+        roles {
+          id
+          name
+        }
       }
     }`,
   )

@@ -10,7 +10,7 @@ const GRAPHQL_URL =
   (import.meta.env.VITE_GRAPHQL_URL as string | undefined) ?? 'http://localhost:8000/graphql'
 
 /** Standard shape returned by the GraphQL server */
-export interface GraphQLResponse<T = Record<string, unknown>> {
+export interface GraphQLResponse<T = unknown> {
   data?: T
   errors?: GraphQLError[]
 }
@@ -42,7 +42,7 @@ function getToken(): string | null {
  * Automatically attaches the Authorization header when a token exists.
  * Throws on network errors and extracts GraphQL-level errors for callers.
  */
-export async function request<T = Record<string, unknown>>(
+export async function request<T = unknown>(
   operationQuery: string,
   variables?: Record<string, unknown>,
 ): Promise<GraphQLResponse<T>> {
@@ -75,7 +75,7 @@ export async function request<T = Record<string, unknown>>(
  * Convenience wrapper for GraphQL queries.
  * Identical to request() — exists for semantic clarity at call sites.
  */
-export async function query<T = Record<string, unknown>>(
+export async function query<T = unknown>(
   queryString: string,
   variables?: Record<string, unknown>,
 ): Promise<GraphQLResponse<T>> {
@@ -86,7 +86,7 @@ export async function query<T = Record<string, unknown>>(
  * Convenience wrapper for GraphQL mutations.
  * Identical to request() — exists for semantic clarity at call sites.
  */
-export async function mutation<T = Record<string, unknown>>(
+export async function mutation<T = unknown>(
   mutationString: string,
   variables?: Record<string, unknown>,
 ): Promise<GraphQLResponse<T>> {

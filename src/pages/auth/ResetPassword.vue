@@ -13,6 +13,7 @@ import BaseButton from '@/components/BaseButton.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
 import { useFormErrors } from '@/composables/useFormErrors'
+import { LockClosedIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
 const router = useRouter()
@@ -75,19 +76,7 @@ async function handleReset() {
           :error="firstError('password')"
         >
           <template #icon>
-            <svg
-              class="w-5 h-5 text-textSecondary shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-              />
-            </svg>
+            <LockClosedIcon class="w-5 h-5 text-textSecondary shrink-0" />
           </template>
         </BaseInput>
 
@@ -98,19 +87,7 @@ async function handleReset() {
           :error="firstError('password_confirmation')"
         >
           <template #icon>
-            <svg
-              class="w-5 h-5 text-textSecondary shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-              />
-            </svg>
+            <ShieldCheckIcon class="w-5 h-5 text-textSecondary shrink-0" />
           </template>
         </BaseInput>
 

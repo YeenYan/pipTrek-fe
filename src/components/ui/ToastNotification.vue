@@ -6,6 +6,7 @@
  */
 
 import { useToast } from '@/composables/useToast'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 const { toasts, dismiss } = useToast()
 
@@ -39,15 +40,7 @@ function typeClasses(type: string): string {
           @click="dismiss(toast.id)"
           class="shrink-0 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
         >
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <XMarkIcon class="w-4 h-4" />
         </button>
       </div>
     </TransitionGroup>

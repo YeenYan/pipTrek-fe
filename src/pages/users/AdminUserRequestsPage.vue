@@ -18,6 +18,7 @@ import {
 import { register } from '@/services/authService'
 import { extractErrorMessage } from '@/utils/graphqlClient'
 import { useToast } from '@/composables/useToast'
+import { UserPlusIcon } from '@heroicons/vue/24/outline'
 
 const toast = useToast()
 
@@ -30,7 +31,7 @@ const loading = ref(false)
 const statusFilter = ref<string>('')
 
 /** Define the table columns with optional formatters */
-const columns: TableColumn[] = [
+const columns: TableColumn<RegistrationRequest>[] = [
   { key: 'username', label: 'Username' },
   { key: 'email', label: 'Email' },
   {
@@ -79,11 +80,10 @@ const registerTwoFactor = ref(false)
 const registering = ref(false)
 
 /** Open the approval modal for a specific request row */
-function handleRowClick(row: Record<string, unknown>) {
-  const req = row as unknown as RegistrationRequest
-  if (req.status !== 'pending') return
-  selectedRequest.value = req
-  registerName.value = req.username
+function handleRowClick(row: RegistrationRequest) {
+  if (row.status !== 'pending') return
+  selectedRequest.value = row
+  registerName.value = row.username
   modalOpen.value = true
 }
 
@@ -136,7 +136,7 @@ async function handleRegister() {
     <!-- Requests table -->
     <BaseTable
       :columns="columns"
-      :rows="requests as unknown as Record<string, unknown>[]"
+      :rows="requests"
       :loading="loading"
       empty-message="No registration requests found."
       @row-click="handleRowClick"
@@ -151,7 +151,11 @@ async function handleRegister() {
         </p>
 
         <div class="space-y-4">
-          <BaseInput v-model="registerName" type="text" placeholder="Full name" />
+          <BaseInput v-model="registerName" type="text" placeholder="Full name">
+            <template #icon>
+              <UserPlusIcon class="w-5 h-5 text-textSecondary shrink-0" />
+            </template>
+          </BaseInput>
 
           <label class="flex items-center gap-2 text-sm text-textSecondary cursor-pointer">
             <input v-model="registerTwoFactor" type="checkbox" class="accent-primary" />

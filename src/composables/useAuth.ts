@@ -20,6 +20,7 @@ interface AuthState {
   token: string | null
   isFirstLogin: boolean
   requiresOtp: boolean
+  otpVerified: boolean
   otpEmail: string
   loading: boolean
 }
@@ -29,6 +30,7 @@ const state = reactive<AuthState>({
   token: localStorage.getItem('auth_token'),
   isFirstLogin: false,
   requiresOtp: false,
+  otpVerified: !localStorage.getItem('otp_pending'),
   otpEmail: '',
   loading: false,
 })
@@ -57,8 +59,10 @@ export function useAuth() {
     state.user = null
     state.isFirstLogin = false
     state.requiresOtp = false
+    state.otpVerified = true
     state.otpEmail = ''
     localStorage.removeItem('auth_token')
+    localStorage.removeItem('otp_pending')
   }
 
   /**
@@ -84,19 +88,30 @@ export function useAuth() {
       state.isFirstLogin = data.is_first_login
       state.requiresOtp = data.requires_otp
 
+      // Determine next step for the caller
+      if (data.requires_otp) {
+        // Do NOT store the token yet — OTP must be verified first.
+        // The backend may return a temporary token or null;
+        // either way, withhold it so the user cannot access
+        // protected routes before OTP verification.
+        state.otpEmail = email
+        state.otpVerified = false
+        localStorage.setItem('otp_pending', '1')
+        return { success: true, next: 'otp' as const, message: data.message }
+      }
+
+      // First-login (no OTP): store the temporary token so
+      // changePassword can use it, then redirect.
       if (data.token) {
         setToken(data.token)
       }
 
-      // Determine next step for the caller
-      if (data.requires_otp) {
-        state.otpEmail = email
-        return { success: true, next: 'otp' as const, message: data.message }
-      }
       if (data.is_first_login) {
         return { success: true, next: 'change-password' as const, message: data.message }
       }
 
+      state.otpVerified = true
+      localStorage.removeItem('otp_pending')
       return { success: true, next: 'dashboard' as const, message: data.message }
     } catch (err) {
       return { success: false, message: (err as Error).message }
@@ -119,6 +134,8 @@ export function useAuth() {
 
       const data = res.data!.verifyOtp
       state.user = data.user
+      state.otpVerified = true
+      localStorage.removeItem('otp_pending')
       setToken(data.token)
 
       // If first-login + OTP, they still need to change password

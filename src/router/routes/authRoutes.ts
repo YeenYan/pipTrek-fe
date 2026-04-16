@@ -16,6 +16,7 @@ const authRoutes = [
     path: '/otp',
     name: 'OtpVerification',
     component: () => import('@/pages/auth/OtpVerification.vue'),
+    meta: { requiresOtp: true },
   },
   {
     path: '/reset-password',
