@@ -3,7 +3,15 @@
  *
  * Provides a single, reusable client for all GraphQL operations.
  * Handles authorization headers, error extraction, and type-safe wrappers.
+ *
+ * Authentication interceptor:
+ * - Detects HTTP 401 / 403 responses.
+ * - Detects GraphQL-level "unauthenticated" errors.
+ * - Fires a registered callback (registered by the router guards) so the app
+ *   can clear state and redirect without creating a circular import cycle.
  */
+
+import { getToken } from '@/utils/tokenStorage'
 
 /** Base URL for the GraphQL endpoint — configurable via environment variable */
 const GRAPHQL_URL =
@@ -24,13 +32,52 @@ export interface GraphQLError {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/*  Unauthenticated handler                                            */
+/* ------------------------------------------------------------------ */
+
+/** Registered callback — set via registerUnauthHandler() */
+let unauthHandler: (() => void) | null = null
+
 /**
- * Retrieve the stored JWT token from localStorage.
- * Returns null when the user is not authenticated.
+ * Debounce flag: prevents the same session expiry from triggering the
+ * handler multiple times when several in-flight requests all fail at once.
+ * Automatically resets after 5 s to allow re-login within the same tab.
  */
-function getToken(): string | null {
-  return localStorage.getItem('auth_token')
+let isHandlingExpiry = false
+
+/**
+ * Fire the unauthenticated handler at most once per expiry event.
+ * Skips silently when:
+ *   - there is no registered handler,
+ *   - we are already handling an expiry,
+ *   - there is no token to invalidate (user was never logged in).
+ */
+function triggerUnauthenticated(): void {
+  if (isHandlingExpiry || !unauthHandler || !getToken()) return
+  isHandlingExpiry = true
+  unauthHandler()
+  // Reset the flag after enough time for re-login to complete
+  setTimeout(() => {
+    isHandlingExpiry = false
+  }, 5_000)
 }
+
+/**
+ * Register the callback that should run when a request detects an
+ * invalid / expired session. Call this once during app initialisation
+ * (e.g. inside setupGuards).
+ *
+ * The callback is responsible for clearing auth state and redirecting
+ * the user — the GraphQL client itself has no knowledge of Vue Router.
+ */
+export function registerUnauthHandler(handler: () => void): void {
+  unauthHandler = handler
+}
+
+/* ------------------------------------------------------------------ */
+/*  Request                                                            */
+/* ------------------------------------------------------------------ */
 
 /**
  * Core request function — sends a GraphQL operation to the backend.
@@ -62,12 +109,29 @@ export async function request<T = unknown>(
     body: JSON.stringify({ query: operationQuery, variables }),
   })
 
-  // Handle HTTP-level failures (network errors, 500s, etc.)
+  // HTTP 401 / 403 — session is invalid at the transport level
+  if (res.status === 401 || res.status === 403) {
+    triggerUnauthenticated()
+  }
+
+  // Handle other HTTP-level failures (network errors, 500s, etc.)
   if (!res.ok) {
     throw new Error(`Network error: ${res.status} ${res.statusText}`)
   }
 
   const json: GraphQLResponse<T> = await res.json()
+
+  // GraphQL-level authentication errors (HTTP 200 but auth failed)
+  const hasAuthError = json.errors?.some(
+    (e) =>
+      e.extensions?.category === 'authentication' ||
+      e.message?.toLowerCase().includes('unauthenticated') ||
+      e.message?.toLowerCase().includes('unauthorized'),
+  )
+  if (hasAuthError) {
+    triggerUnauthenticated()
+  }
+
   return json
 }
 

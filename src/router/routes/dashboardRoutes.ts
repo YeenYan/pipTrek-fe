@@ -13,6 +13,11 @@ const dashboardRoutes = [
         component: () => import('@/pages/dashboard/HomePage.vue'),
       },
       {
+        path: 'trading-accounts',
+        name: 'TradingAccounts',
+        component: () => import('@/pages/accounts/AccountsPage.vue'),
+      },
+      {
         path: 'journal',
         name: 'Journal',
         component: () => import('@/pages/dashboard/HomePage.vue'),

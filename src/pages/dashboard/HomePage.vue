@@ -6,13 +6,17 @@
 
 import { onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useLoadingStore } from '@/stores/loading'
 
 const { state, fetchMe } = useAuth()
+const { startPageLoading, stopPageLoading } = useLoadingStore()
 
 /** Load the current user profile on mount if not already loaded */
 onMounted(async () => {
   if (!state.user) {
+    startPageLoading()
     await fetchMe()
+    stopPageLoading()
   }
 })
 </script>

@@ -18,9 +18,11 @@ import {
 import { register } from '@/services/authService'
 import { extractErrorMessage } from '@/utils/graphqlClient'
 import { useToast } from '@/composables/useToast'
+import { useLoadingStore } from '@/stores/loading'
 import { UserPlusIcon } from '@heroicons/vue/24/outline'
 
 const toast = useToast()
+const { startPageLoading, stopPageLoading } = useLoadingStore()
 
 /* ------------------------------------------------------------------ */
 /*  Table data                                                         */
@@ -67,7 +69,11 @@ async function fetchRequests() {
   }
 }
 
-onMounted(fetchRequests)
+onMounted(async () => {
+  startPageLoading()
+  await fetchRequests()
+  stopPageLoading()
+})
 
 /* ------------------------------------------------------------------ */
 /*  Approve / register flow                                            */

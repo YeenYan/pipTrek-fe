@@ -6,7 +6,7 @@
 
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import AuthLayout from '@/modules/auth/AuthLayout.vue'
+import AuthLayout from '@/layouts/AuthLayout.vue'
 import BaseCard from '@/components/BaseCard.vue'
 import BaseInput from '@/components/BaseInput.vue'
 import BaseButton from '@/components/BaseButton.vue'

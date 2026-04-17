@@ -10,6 +10,14 @@ import { reactive, computed } from 'vue'
 import * as authService from '@/services/authService'
 import type { User } from '@/services/authService'
 import { extractErrorMessage, extractValidationErrors } from '@/utils/graphqlClient'
+import {
+  getToken,
+  setToken as storageSetToken,
+  getOtpPending,
+  setOtpPending,
+  removeOtpPending,
+  clearAllAuthKeys,
+} from '@/utils/tokenStorage'
 
 /* ------------------------------------------------------------------ */
 /*  Singleton state — lives outside the composable so it's shared      */
@@ -27,10 +35,10 @@ interface AuthState {
 
 const state = reactive<AuthState>({
   user: null,
-  token: localStorage.getItem('auth_token'),
+  token: getToken(),
   isFirstLogin: false,
   requiresOtp: false,
-  otpVerified: !localStorage.getItem('otp_pending'),
+  otpVerified: !getOtpPending(),
   otpEmail: '',
   loading: false,
 })
@@ -48,11 +56,12 @@ export function useAuth() {
    */
   function setToken(token: string) {
     state.token = token
-    localStorage.setItem('auth_token', token)
+    storageSetToken(token)
   }
 
   /**
-   * Remove token from storage and reset auth state.
+   * Remove all auth data from storage and reset reactive state.
+   * Safe to call multiple times (idempotent).
    */
   function clearSession() {
     state.token = null
@@ -61,8 +70,7 @@ export function useAuth() {
     state.requiresOtp = false
     state.otpVerified = true
     state.otpEmail = ''
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('otp_pending')
+    clearAllAuthKeys()
   }
 
   /**
@@ -96,7 +104,7 @@ export function useAuth() {
         // protected routes before OTP verification.
         state.otpEmail = email
         state.otpVerified = false
-        localStorage.setItem('otp_pending', '1')
+        setOtpPending()
         return { success: true, next: 'otp' as const, message: data.message }
       }
 
@@ -111,7 +119,7 @@ export function useAuth() {
       }
 
       state.otpVerified = true
-      localStorage.removeItem('otp_pending')
+      removeOtpPending()
       return { success: true, next: 'dashboard' as const, message: data.message }
     } catch (err) {
       return { success: false, message: (err as Error).message }
@@ -135,7 +143,7 @@ export function useAuth() {
       const data = res.data!.verifyOtp
       state.user = data.user
       state.otpVerified = true
-      localStorage.removeItem('otp_pending')
+      removeOtpPending()
       setToken(data.token)
 
       // If first-login + OTP, they still need to change password
@@ -250,11 +258,16 @@ export function useAuth() {
 
   /**
    * Fetch the current user's profile.
+   * Throws when the response contains errors so the router guard's
+   * try/catch can intercept it and redirect to login.
    */
   async function fetchMe() {
     state.loading = true
     try {
       const res = await authService.me()
+      if (res.errors) {
+        throw new Error(extractErrorMessage(res))
+      }
       if (res.data?.me) {
         state.user = res.data.me
       }

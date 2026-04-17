@@ -44,6 +44,9 @@
         <router-view />
       </div>
     </main>
+
+    <!-- Global page-level loading overlay -->
+    <MainLoading />
   </div>
 </template>
 
@@ -51,6 +54,7 @@
 import { onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import SideNav from '@/components/sidebar/SideNav.vue'
+import MainLoading from '@/components/ui/MainLoading.vue'
 
 const { state, fetchMe } = useAuth()
 

@@ -116,6 +116,7 @@ import {
   ArrowTopRightOnSquareIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  BanknotesIcon,
 } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
@@ -131,6 +132,7 @@ function toggleSidebar() {
 
 const mainItems = [
   { label: 'Dashboard', icon: HomeIcon, to: '/dashboard' },
+  { label: 'Trading Accounts', icon: BanknotesIcon, to: '/trading-accounts' },
   { label: 'Journal', icon: BookOpenIcon, to: '/journal' },
   { label: 'Personal Analytics', icon: ChartBarIcon, to: '/personal-analytics' },
   { label: 'AI Analytics', icon: SparklesIcon, to: '/ai-analytics' },
